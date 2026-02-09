@@ -1,22 +1,23 @@
-# Welcome to your Lovable project
+# KU Notice Board Display System
 
-## Project info
+A modern notice board display system for Kathmandu University with real-time updates, role-based access control, and a responsive design.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Admin Dashboard**: Manage notices with draft/publish functionality
+- **Role-Based Access Control**: Admin and user roles with approval workflows
+- **Real-Time Updates**: Socket.io integration for live updates
+- **Display System**: Full-screen notice display with slideshow functionality
+- **Cloud Storage**: Cloudinary integration for image/PDF uploads
+- **Offline Support**: IndexedDB caching for offline viewing
 
-There are several ways of editing your application.
+## How to Work with This Code
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+You can edit this code in several ways:
 
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Clone this repo and make changes locally. Push changes to update the deployed version.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -60,14 +61,11 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+Deploy this project using your preferred hosting service (Vercel, Netlify, etc.).
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Set the following environment variables:
+- `VITE_API_BASE_URL`: Your backend API URL
+- `VITE_SUPABASE_PROJECT_ID`: Supabase project ID (if using)
+- `VITE_SUPABASE_PUBLISHABLE_KEY`: Supabase public key (if using)
