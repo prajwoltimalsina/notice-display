@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema({
     default: false,
     description: 'Indicates if an admin account has been approved',
   },
+  isSuperAdmin: {
+    type: Boolean,
+    default: false,
+    description: 'Only the first admin can approve/reject other admins',
+  },
   approvedAt: {
     type: Date,
     default: null,

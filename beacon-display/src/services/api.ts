@@ -117,6 +117,15 @@ export const api = {
       if (!response.ok) throw new Error('Failed to reject admin');
       return response.json();
     },
+
+    removeAdmin: async (adminId: string) => {
+      const response = await fetch(`${API_BASE_URL}/api/auth/admin/${adminId}/remove`, {
+        method: 'PATCH',
+        headers: getHeaders(),
+      });
+      if (!response.ok) throw new Error('Failed to remove admin');
+      return response.json();
+    },
   },
 
   notices: {

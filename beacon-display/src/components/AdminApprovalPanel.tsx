@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api } from "@/services/api";
+import { useMongoAuth } from "@/hooks/useMongoAuth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,6 +16,7 @@ import {
   Clock,
   AlertCircle,
   Loader2,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,10 +37,30 @@ interface ApprovedAdmin {
 }
 
 export function AdminApprovalPanel() {
+  const { isSuperAdmin } = useMongoAuth();
   const [pendingAdmins, setPendingAdmins] = useState<PendingAdmin[]>([]);
   const [approvedAdmins, setApprovedAdmins] = useState<ApprovedAdmin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
+  // Only super admin can access this panel
+  if (!isSuperAdmin) {
+    return (
+      <Card className="border-amber-200 bg-amber-50">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-3 text-amber-800">
+            <Lock className="w-5 h-5" />
+            <div>
+              <p className="font-semibold">Admin Approvals Restricted</p>
+              <p className="text-sm text-amber-700">
+                Only the super admin can manage admin approvals and permissions.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   useEffect(() => {
     loadApprovals();
@@ -90,6 +112,23 @@ export function AdminApprovalPanel() {
     } catch (error) {
       console.error("Failed to reject admin:", error);
       toast.error("Failed to reject admin");
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const handleRemoveAdmin = async (adminId: string, adminName: string) => {
+    try {
+      setIsProcessing(adminId);
+      await api.auth.removeAdmin(adminId);
+      toast.success(`Removed admin privileges from ${adminName}`);
+
+      // Update local state
+      setApprovedAdmins(approvedAdmins.filter((a) => a._id !== adminId));
+      await loadApprovals();
+    } catch (error) {
+      console.error("Failed to remove admin:", error);
+      toast.error("Failed to remove admin");
     } finally {
       setIsProcessing(null);
     }
@@ -218,6 +257,20 @@ export function AdminApprovalPanel() {
                       {new Date(admin.approvedAt).toLocaleDateString()}
                     </p>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRemoveAdmin(admin._id, admin.name)}
+                    disabled={isProcessing !== null}
+                    className="gap-1 text-destructive hover:text-destructive"
+                  >
+                    {isProcessing === admin._id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <XCircle className="w-4 h-4" />
+                    )}
+                    Remove Admin
+                  </Button>
                 </div>
               ))}
             </div>

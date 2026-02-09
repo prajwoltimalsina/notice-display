@@ -147,14 +147,19 @@ exports.removeAdmin = async (req, res) => {
   try {
     const { adminId } = req.params;
 
-    // Prevent removing self
-    if (adminId === req.user._id.toString()) {
-      return res.status(400).json({ message: 'You cannot remove your own admin privileges' });
-    }
-
+    // Prevent removing the super admin
     const userToUpdate = await User.findById(adminId);
     if (!userToUpdate) {
       return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (userToUpdate.isSuperAdmin) {
+      return res.status(403).json({ message: 'Cannot remove super admin privileges' });
+    }
+
+    // Prevent removing self
+    if (adminId === req.user._id.toString()) {
+      return res.status(400).json({ message: 'You cannot remove your own admin privileges' });
     }
 
     if (userToUpdate.role !== 'admin') {

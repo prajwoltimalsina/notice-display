@@ -27,7 +27,8 @@ exports.register = async (req, res) => {
     console.log('User count:', userCount);
     const userRole = userCount === 0 ? 'admin' : role; // First user is always admin
     const isApproved = userCount === 0 || userRole === 'user'; // First user OR regular users are auto-approved
-    console.log('Creating user with role:', userRole, 'isApproved:', isApproved);
+    const isSuperAdmin = userCount === 0; // Only first user is super admin
+    console.log('Creating user with role:', userRole, 'isApproved:', isApproved, 'isSuperAdmin:', isSuperAdmin);
 
     const user = new User({
       email,
@@ -35,6 +36,7 @@ exports.register = async (req, res) => {
       name,
       role: userRole,
       isApproved,
+      isSuperAdmin,
     });
 
     await user.save();
@@ -48,6 +50,7 @@ exports.register = async (req, res) => {
         email: user.email,
         name: user.name,
         role: user.role,
+        isSuperAdmin: user.isSuperAdmin,
       });
     }
 
@@ -62,6 +65,7 @@ exports.register = async (req, res) => {
       name: user.name,
       role: user.role,
       isApproved: user.isApproved,
+      isSuperAdmin: user.isSuperAdmin,
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -106,6 +110,7 @@ exports.login = async (req, res) => {
       name: user.name,
       role: user.role,
       isApproved: user.isApproved,
+      isSuperAdmin: user.isSuperAdmin,
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -122,6 +127,7 @@ exports.getProfile = async (req, res) => {
       name: req.user.name,
       role: req.user.role,
       isApproved: req.user.isApproved,
+      isSuperAdmin: req.user.isSuperAdmin,
     });
   } catch (error) {
     console.error('Get profile error:', error);

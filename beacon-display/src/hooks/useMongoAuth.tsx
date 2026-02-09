@@ -13,12 +13,14 @@ interface MongoUser {
   name: string;
   role: "admin" | "user";
   isApproved?: boolean;
+  isSuperAdmin?: boolean;
 }
 
 interface MongoAuthContextType {
   user: MongoUser | null;
   isAdmin: boolean;
   isAdminApproved: boolean;
+  isSuperAdmin: boolean;
   isLoading: boolean;
   loginError?: string;
   signIn: (
@@ -85,6 +87,7 @@ export function MongoAuthProvider({ children }: { children: ReactNode }) {
         name: data.name,
         role: data.role,
         isApproved: data.isApproved,
+        isSuperAdmin: data.isSuperAdmin,
       });
       setLoginError(undefined);
       return { error: null };
@@ -122,6 +125,7 @@ export function MongoAuthProvider({ children }: { children: ReactNode }) {
         name: data.name,
         role: data.role,
         isApproved: data.isApproved,
+        isSuperAdmin: data.isSuperAdmin,
       });
       setLoginError(undefined);
       return { error: null };
@@ -145,6 +149,7 @@ export function MongoAuthProvider({ children }: { children: ReactNode }) {
         user,
         isAdmin: user?.role === "admin",
         isAdminApproved: user?.role === "admin" && user?.isApproved === true,
+        isSuperAdmin: user?.isSuperAdmin === true,
         isLoading,
         loginError,
         signIn,

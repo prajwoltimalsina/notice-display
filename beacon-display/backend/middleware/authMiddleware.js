@@ -39,4 +39,13 @@ const adminMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = { authMiddleware, adminMiddleware };
+// Super admin only middleware (only first admin can manage other admins)
+const superAdminMiddleware = (req, res, next) => {
+  if (req.user && req.user.role === 'admin' && req.user.isSuperAdmin) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Access denied. Only the super admin can manage other admins.' });
+  }
+};
+
+module.exports = { authMiddleware, adminMiddleware, superAdminMiddleware };
