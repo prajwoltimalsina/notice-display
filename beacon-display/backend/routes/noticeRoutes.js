@@ -46,17 +46,7 @@ const { upload } = require('../config/cloudinary');
 
 module.exports = (io) => {
   // Public: GET published notices
-  router.get('/published', async (req, res) => {
-    try {
-      const notices = await noticeController.getPublishedNotices(req, res);
-      res.json({
-        updatedAt: Date.now(),
-        notices,
-      });
-    } catch (err) {
-      res.status(500).json({ error: "Failed to fetch published notices" });
-    }
-  });
+  router.get('/published', noticeController.getPublishedNotices);
 
   // Admin protected routes - require both auth and admin role
   router.get('/', authMiddleware, adminMiddleware, noticeController.getAllNotices);

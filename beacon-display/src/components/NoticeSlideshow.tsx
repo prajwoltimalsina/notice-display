@@ -5,54 +5,66 @@ import { Button } from "./ui/button";
 import { saveNotices, getNotices, getMedia } from "@/utils/db";
 
 interface NoticeSlideshowProps {
+  notices: Notice[];
   intervalMs?: number; // Auto-advance interval in ms
 }
 
-export function NoticeSlideshow({ intervalMs = 10000 }: NoticeSlideshowProps) {
-  const [offlineNotices, setOfflineNotices] = useState<Notice[]>([]);
+export function NoticeSlideshow({
+  notices,
+  intervalMs = 10000,
+}: NoticeSlideshowProps) {
+  const [offlineNotices, setOfflineNotices] = useState<Notice[]>(notices);
   const [mediaMap, setMediaMap] = useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const noticesPerPage = 2;
 
+  // Update offline notices when prop changes
+  useEffect(() => {
+    setOfflineNotices(notices);
+  }, [notices]);
+
   // Load notices with online → offline fallback
   useEffect(() => {
     async function loadNotices() {
-      // 1️⃣ Always load from IndexedDB first
-      const cached = await getNotices();
-      if (cached.length > 0) {
-        setOfflineNotices(cached);
+      const noticeList = notices.length > 0 ? notices : await getNotices();
+      if (noticeList.length > 0) {
+        setOfflineNotices(noticeList);
 
         // preload media
         const map: Record<string, string> = {};
         await Promise.all(
-          cached.map(async (n) => {
+          noticeList.map(async (n) => {
             if (n.fileUrl) map[n._id] = await getMedia(n.fileUrl);
           }),
         );
         setMediaMap(map);
       }
 
-      // 2️⃣ If offline, STOP here
+      // If offline, STOP here
       if (!navigator.onLine) return;
 
-      // 3️⃣ Fetch fresh data online
-      try {
-        const res = await fetch("http://localhost:5000/api/notices/published");
-        const data = await res.json();
+      // Fetch fresh data online if not already provided
+      if (notices.length === 0) {
+        try {
+          const res = await fetch(
+            "http://localhost:5000/api/notices/published",
+          );
+          const data = await res.json();
 
-        await saveNotices(data.notices);
-        setOfflineNotices(data.notices);
+          await saveNotices(data);
+          setOfflineNotices(data);
 
-        const map: Record<string, string> = {};
-        await Promise.all(
-          data.notices.map(async (n: Notice) => {
-            if (n.fileUrl) map[n._id] = await getMedia(n.fileUrl);
-          }),
-        );
-        setMediaMap(map);
-      } catch {
-        // silent fail — cached data already shown
+          const map: Record<string, string> = {};
+          await Promise.all(
+            data.map(async (n: Notice) => {
+              if (n.fileUrl) map[n._id] = await getMedia(n.fileUrl);
+            }),
+          );
+          setMediaMap(map);
+        } catch {
+          // silent fail — cached data already shown
+        }
       }
     }
 
@@ -61,7 +73,7 @@ export function NoticeSlideshow({ intervalMs = 10000 }: NoticeSlideshowProps) {
     const handleOnline = () => loadNotices();
     window.addEventListener("online", handleOnline);
     return () => window.removeEventListener("online", handleOnline);
-  }, []);
+  }, [notices]);
 
   const publishedNotices = offlineNotices.filter((n) => n.is_published);
   const totalPages = Math.ceil(publishedNotices.length / noticesPerPage);

@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Notice } from '@/types/database';
-import { toast } from 'sonner';
-import { api } from '@/services/api';
-import { useSocket } from './useSocket';
+import { useState, useEffect, useCallback } from "react";
+import { Notice } from "@/types/database";
+import { toast } from "sonner";
+import { api } from "@/services/api";
+import { useSocket } from "./useSocket";
 
 export function useNotices(publicOnly = false) {
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -10,13 +10,14 @@ export function useNotices(publicOnly = false) {
 
   const fetchNotices = useCallback(async () => {
     try {
-      const data = publicOnly 
+      const data = publicOnly
         ? await api.notices.getPublished()
         : await api.notices.getAll();
+      console.log("Fetched notices:", data);
       setNotices(data);
     } catch (error) {
-      toast.error('Failed to load notices');
-      console.error(error);
+      toast.error("Failed to load notices");
+      console.error("Error fetching notices:", error);
     }
     setIsLoading(false);
   }, [publicOnly]);
@@ -25,25 +26,32 @@ export function useNotices(publicOnly = false) {
   useSocket({
     onNoticeCreated: (notice) => {
       if (!publicOnly || notice.is_published) {
-        setNotices(prev => [notice, ...prev]);
-        toast.success('New notice added');
+        setNotices((prev) => [notice, ...prev]);
+        toast.success("New notice added");
       }
     },
     onNoticeUpdated: (notice) => {
-      setNotices(prev => prev.map(n => n._id === notice._id ? notice : n));
+      setNotices((prev) =>
+        prev.map((n) => (n._id === notice._id ? notice : n)),
+      );
     },
     onNoticeDeleted: ({ _id }) => {
-      setNotices(prev => prev.filter(n => n._id !== _id));
+      setNotices((prev) => prev.filter((n) => n._id !== _id));
     },
     onNoticeToggled: (notice) => {
       if (publicOnly) {
         if (notice.is_published) {
-          setNotices(prev => [notice, ...prev.filter(n => n._id !== notice._id)]);
+          setNotices((prev) => [
+            notice,
+            ...prev.filter((n) => n._id !== notice._id),
+          ]);
         } else {
-          setNotices(prev => prev.filter(n => n._id !== notice._id));
+          setNotices((prev) => prev.filter((n) => n._id !== notice._id));
         }
       } else {
-        setNotices(prev => prev.map(n => n._id === notice._id ? notice : n));
+        setNotices((prev) =>
+          prev.map((n) => (n._id === notice._id ? notice : n)),
+        );
       }
     },
   });
@@ -53,30 +61,36 @@ export function useNotices(publicOnly = false) {
   }, [fetchNotices]);
 
   // Upload file and create notice in one request
-  const createNotice = async (file: File, noticeData: {
-    title: string;
-    description?: string;
-    is_published: boolean;
-    created_by: string;
-  }) => {
+  const createNotice = async (
+    file: File,
+    noticeData: {
+      title: string;
+      description?: string;
+      is_published: boolean;
+      created_by: string;
+    },
+  ) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', noticeData.title);
+      formData.append("file", file);
+      formData.append("title", noticeData.title);
       if (noticeData.description) {
-        formData.append('description', noticeData.description);
+        formData.append("description", noticeData.description);
       }
-      formData.append('is_published', String(noticeData.is_published));
-      formData.append('status', noticeData.is_published ? 'published' : 'draft');
-      formData.append('created_by', noticeData.created_by);
-      formData.append('file_type', file.type);
+      formData.append("is_published", String(noticeData.is_published));
+      formData.append(
+        "status",
+        noticeData.is_published ? "published" : "draft",
+      );
+      formData.append("created_by", noticeData.created_by);
+      formData.append("file_type", file.type);
 
       const result = await api.notices.upload(formData);
       // Socket will handle adding to state
-      toast.success('Notice created successfully');
+      toast.success("Notice created successfully");
       return result.notice as Notice;
     } catch (error) {
-      toast.error('Failed to create notice');
+      toast.error("Failed to create notice");
       throw error;
     }
   };
@@ -85,10 +99,10 @@ export function useNotices(publicOnly = false) {
     try {
       const result = await api.notices.update(id, updates);
       // Socket will handle state update
-      toast.success('Notice updated successfully');
+      toast.success("Notice updated successfully");
       return result.notice as Notice;
     } catch (error) {
-      toast.error('Failed to update notice');
+      toast.error("Failed to update notice");
       throw error;
     }
   };
@@ -100,7 +114,7 @@ export function useNotices(publicOnly = false) {
       toast.success(result.message);
       return result.notice as Notice;
     } catch (error) {
-      toast.error('Failed to toggle notice status');
+      toast.error("Failed to toggle notice status");
       throw error;
     }
   };
@@ -109,9 +123,9 @@ export function useNotices(publicOnly = false) {
     try {
       await api.notices.delete(id);
       // Socket will handle state update
-      toast.success('Notice deleted successfully');
+      toast.success("Notice deleted successfully");
     } catch (error) {
-      toast.error('Failed to delete notice');
+      toast.error("Failed to delete notice");
       throw error;
     }
   };
@@ -123,6 +137,6 @@ export function useNotices(publicOnly = false) {
     updateNotice,
     togglePublish,
     deleteNotice,
-    refetch: fetchNotices
+    refetch: fetchNotices,
   };
 }

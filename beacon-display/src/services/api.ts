@@ -135,14 +135,16 @@ export const api = {
         headers: getHeaders(),
       });
       if (!response.ok) throw new Error('Failed to fetch notices');
-      return response.json();
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
 
     // Get published notices only (public - no auth required)
     getPublished: async () => {
       const response = await fetch(`${API_BASE_URL}/api/notices/published`);
       if (!response.ok) throw new Error('Failed to fetch published notices');
-      return response.json();
+      const data = await response.json();
+      return Array.isArray(data) ? data : [];
     },
     
     // Upload file and create notice
