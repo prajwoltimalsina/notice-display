@@ -77,7 +77,7 @@ export default function Index() {
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold mb-4">Powerful Features</h2>
               <p className="text-muted-foreground">
-                Everything you need for digital signage
+                Everything you need for digital sign
               </p>
             </div>
 
@@ -87,13 +87,13 @@ export default function Index() {
                   icon: Zap,
                   title: "Real-time Updates",
                   description:
-                    "Changes appear instantly on all connected displays",
+                    "Changes appear instantly on all connected display",
                 },
                 {
                   icon: Users,
                   title: "Role-based Access",
                   description:
-                    "Admin and user roles with appropriate permissions",
+                    "Admin and user roles with appropriate permission",
                 },
                 {
                   icon: Globe,
