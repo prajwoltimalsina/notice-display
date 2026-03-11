@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useMongoAuth } from '@/hooks/useMongoAuth';
-import { useNotices } from '@/hooks/useNotices';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Switch } from './ui/switch';
-import { Upload, Loader2, X, FileText, Image } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { useMongoAuth } from "@/hooks/useMongoAuth";
+import { useNotices } from "@/hooks/useNotices";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Switch } from "./ui/switch";
+import { Upload, Loader2, X, FileText, Image } from "lucide-react";
+import { toast } from "sonner";
 
 interface NoticeFormProps {
   onSuccess?: () => void;
@@ -29,9 +29,14 @@ export function NoticeForm({ onSuccess }: NoticeFormProps) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
-    const validTypes = ['image/png', 'image/jpg', 'image/jpeg', 'application/pdf'];
-    
-    const validFiles = selectedFiles.filter(file => {
+    const validTypes = [
+      "image/png",
+      "image/jpg",
+      "image/jpeg",
+      "application/pdf",
+    ];
+
+    const validFiles = selectedFiles.filter((file) => {
       if (!validTypes.includes(file.type)) {
         toast.error(`${file.name} is not a valid file type`);
         return false;
@@ -39,42 +44,48 @@ export function NoticeForm({ onSuccess }: NoticeFormProps) {
       return true;
     });
 
-    validFiles.forEach(file => {
+    validFiles.forEach((file) => {
       const fileWithPreview: FileWithPreview = {
         file,
         preview: null,
-        title: file.name.split('.')[0]
+        title: file.name.split(".")[0],
       };
 
-      if (file.type.startsWith('image/')) {
+      if (file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          setFiles(prev => prev.map(f => 
-            f.file === file ? { ...f, preview: e.target?.result as string } : f
-          ));
+          setFiles((prev) =>
+            prev.map((f) =>
+              f.file === file
+                ? { ...f, preview: e.target?.result as string }
+                : f,
+            ),
+          );
         };
         reader.readAsDataURL(file);
       }
 
-      setFiles(prev => [...prev, fileWithPreview]);
+      setFiles((prev) => [...prev, fileWithPreview]);
     });
 
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const removeFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const updateFileTitle = (index: number, title: string) => {
     const trimmedTitle = title.slice(0, MAX_TITLE_LENGTH);
-    setFiles(prev => prev.map((f, i) => i === index ? { ...f, title: trimmedTitle } : f));
+    setFiles((prev) =>
+      prev.map((f, i) => (i === index ? { ...f, title: trimmedTitle } : f)),
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (files.length === 0 || !user) {
-      toast.error('Please select at least one file');
+      toast.error("Please select at least one file");
       return;
     }
 
@@ -92,6 +103,7 @@ export function NoticeForm({ onSuccess }: NoticeFormProps) {
       setIsPublished(true);
       setFiles([]);
       onSuccess?.();
+      window.location.reload();
     } catch (error) {
       console.error(error);
     } finally {
@@ -130,12 +142,19 @@ export function NoticeForm({ onSuccess }: NoticeFormProps) {
           <Label>Selected Files ({files.length})</Label>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {files.map((fileItem, index) => (
-              <div key={index} className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg">
+              <div
+                key={index}
+                className="flex items-center gap-3 p-3 bg-secondary/50 rounded-lg"
+              >
                 {fileItem.preview ? (
-                  <img src={fileItem.preview} alt="Preview" className="w-12 h-12 object-cover rounded" />
+                  <img
+                    src={fileItem.preview}
+                    alt="Preview"
+                    className="w-12 h-12 object-cover rounded"
+                  />
                 ) : (
                   <div className="w-12 h-12 bg-primary/20 rounded flex items-center justify-center">
-                    {fileItem.file.type === 'application/pdf' ? (
+                    {fileItem.file.type === "application/pdf" ? (
                       <FileText className="w-6 h-6 text-primary" />
                     ) : (
                       <Image className="w-6 h-6 text-primary" />
@@ -149,9 +168,17 @@ export function NoticeForm({ onSuccess }: NoticeFormProps) {
                     placeholder="Notice title"
                     className="h-8 text-sm"
                   />
-                  <p className="text-xs text-muted-foreground mt-1 truncate">{fileItem.file.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1 truncate">
+                    {fileItem.file.name}
+                  </p>
                 </div>
-                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => removeFile(index)}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive"
+                  onClick={() => removeFile(index)}
+                >
                   <X className="w-4 h-4" />
                 </Button>
               </div>
@@ -162,11 +189,25 @@ export function NoticeForm({ onSuccess }: NoticeFormProps) {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Switch id="is_published" checked={isPublished} onCheckedChange={setIsPublished} />
+          <Switch
+            id="is_published"
+            checked={isPublished}
+            onCheckedChange={setIsPublished}
+          />
           <Label htmlFor="is_published">Publish immediately</Label>
         </div>
-        <Button type="submit" variant="glow" disabled={isLoading || files.length === 0}>
-          {isLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</> : `Create ${files.length} Notice(s)`}
+        <Button
+          type="submit"
+          variant="glow"
+          disabled={isLoading || files.length === 0}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
+            </>
+          ) : (
+            `Create ${files.length} Notice(s)`
+          )}
         </Button>
       </div>
     </form>

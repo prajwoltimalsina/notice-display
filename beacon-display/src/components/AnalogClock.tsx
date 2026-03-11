@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function AnalogClock() {
   const [time, setTime] = useState(new Date());
@@ -20,8 +20,15 @@ export function AnalogClock() {
     <div className="relative w-full aspect-square">
       <svg viewBox="0 0 200 200" className="w-full h-full">
         {/* Clock face */}
-        <circle cx="100" cy="100" r="95" fill="#FFF8DC" stroke="#D4A574" strokeWidth="4" />
-        
+        <circle
+          cx="100"
+          cy="100"
+          r="95"
+          fill="#FFF8DC"
+          stroke="#D4A574"
+          strokeWidth="4"
+        />
+
         {/* Hour markers */}
         {[...Array(12)].map((_, i) => {
           const angle = (i * 30 - 90) * (Math.PI / 180);
@@ -41,7 +48,7 @@ export function AnalogClock() {
             />
           );
         })}
-        
+
         {/* Hour numbers */}
         {[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((num, i) => {
           const angle = (i * 30 - 90) * (Math.PI / 180);
@@ -61,7 +68,7 @@ export function AnalogClock() {
             </text>
           );
         })}
-        
+
         {/* Hour hand */}
         <line
           x1="100"
@@ -73,7 +80,7 @@ export function AnalogClock() {
           strokeLinecap="round"
           transform={`rotate(${hourDeg}, 100, 100)`}
         />
-        
+
         {/* Minute hand */}
         <line
           x1="100"
@@ -85,7 +92,7 @@ export function AnalogClock() {
           strokeLinecap="round"
           transform={`rotate(${minuteDeg}, 100, 100)`}
         />
-        
+
         {/* Second hand */}
         <line
           x1="100"
@@ -97,7 +104,7 @@ export function AnalogClock() {
           strokeLinecap="round"
           transform={`rotate(${secondDeg}, 100, 100)`}
         />
-        
+
         {/* Center dot */}
         <circle cx="100" cy="100" r="6" fill="#FF6B35" />
         <circle cx="100" cy="100" r="3" fill="#1e3a5f" />

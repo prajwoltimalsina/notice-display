@@ -53,7 +53,7 @@ export default function Admin() {
               <div>
                 <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                 <p className="text-muted-foreground">
-                  Manage notices and content
+                  Manage notices and contents
                 </p>
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function Admin() {
               </TabsTrigger>
               <TabsTrigger value="approvals" className="gap-2">
                 <Users className="w-4 h-4" />
-                Admin Approvals
+                Admin Approval
               </TabsTrigger>
             </TabsList>
 
