@@ -141,7 +141,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:8080',
-  'https://notice-displays-zu4h.vercel.app',
+  'https://notice-displays.vercel.app',
   'https://notice-displays-zu4h-n7yxrunkv-prajwol-timalsinas-projects.vercel.app', // Preview deployments
 ];
 
